@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Assistive Report Keyboard",
+  "version": "0.1.0",
+  "description": "Floating assistive keyboard for typing on webpages.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_title": "Toggle Assistive Keyboard"
+  },
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

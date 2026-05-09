@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Note Writer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg:        #edf2fb;
+  --panel:     #ffffff;
+  --palt:      #f3f7fe;
+  --border:    #c3d4f0;
+  --bsoft:     #dce8fa;
+  --ink:       #0e1e3d;
+  --muted:     #4f6a9a;
+  --b900:      #0d2d6b;
+  --b700:      #1450b2;
+  --b500:      #2d74d8;
+  --b100:      #e6f0ff;
+  --green:     #1a9e5c;
+  --r:         9px;
+  --sh:        0 1px 4px rgba(14,30,61,.09);
+  --font:      'Atkinson Hyperlegible', Georgia, serif;
+  --mono:      'JetBrains Mono', monospace;
+}
+.dark {
+  --bg:        #091629;
+  --panel:     #0e2040;
+  --palt:      #0a1a34;
+  --border:    #193568;
+  --bsoft:     #112850;
+  --ink:       #cfe0fa;
+  --muted:     #5a7aa8;
+  --b900:      #82b4f5;
+  --b700:      #5090e8;
+  --b500:      #3470cc;
+  --b100:      #0e2040;
+  --green:     #30c077;
+  --sh:        0 1px 4px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);font-size:15px;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;transition:background .22s,color .22s}
+
+/* Header */
+.hdr{height:50px;background:var(--b900);color:#fff;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.28)}
+.logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:7px}
+.hbtn{height:30px;padding:0 11px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:background .13s}
+.hbtn:hover{background:rgba(255,255,255,.24)}
+
+/* Split */
+.split{display:flex;flex:1;overflow:hidden;gap:1px;background:var(--border)}
+
+/* Left — Document */
+.doc{width:40%;min-width:260px;background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
+.pbar{height:36px;background:var(--palt);border-bottom:1px solid var(--border);padding:0 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.plbl{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.wct{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.ttl-wrap{padding:13px 15px 9px;border-bottom:1px solid var(--bsoft);flex-shrink:0}
+.ttl{width:100%;border:none;background:transparent;font-family:var(--font);font-size:19px;font-weight:700;color:var(--ink);outline:none;line-height:1.3}
+.ttl::placeholder{color:var(--border)}
+.sec-scroll{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:5px}
+.sc{border:1.5px solid var(--bsoft);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:border-color .14s,background .14s}
+.sc:hover{border-color:var(--b500)}
+.sc.active{border-color:var(--b700);background:var(--b100)}
+.sc.filled{border-left:3px solid var(--green)}
+.sc.active.filled{border-color:var(--b700);border-left-color:var(--b700)}
+.sc-h{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--b700);margin-bottom:3px}
+.dark .sc-h{color:var(--b900)}
+.sc-b{font-size:13px;line-height:1.5;color:var(--ink);white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.sc-b.mt{color:var(--muted);font-style:italic}
+.doc-ft{padding:7px 9px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0}
+.dfb{flex:1;height:33px;border:1.5px solid var(--border);border-radius:6px;background:var(--panel);color:var(--ink);font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:border-color .13s,color .13s}
+.dfb:hover{border-color:var(--b700);color:var(--b700)}
+.dfb.sol{background:var(--b700);border-color:var(--b700);color:#fff}
+.dfb.sol:hover{background:var(--b500);border-color:var(--b500)}
+
+/* Right — Editor */
+.editor{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.etop{height:46px;background:var(--panel);border-bottom:1px solid var(--border);padding:0 11px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.elbl{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.05em;color:var(--b700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dark .elbl{color:var(--b900)}
+.tbtn{height:30px;padding:0 13px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;border:1.5px solid var(--border);background:var(--panel);color:var(--ink);white-space:nowrap;transition:all .11s}
+.tbtn:hover{border-color:var(--b500);color:var(--b500)}
+.tbtn.send{background:var(--b700);border-color:var(--b700);color:#fff}
+.tbtn.send:hover{background:var(--b500);border-color:var(--b500)}
+
+/* Text display — uses pre-wrap so \n renders correctly */
+.td{background:var(--panel);margin:8px 9px 0;border:1.5px solid var(--border);border-radius:var(--r);padding:11px 13px;min-height:68px;max-height:120px;overflow-y:auto;font-family:var(--font);font-size:17px;line-height:1.55;white-space:pre-wrap;word-break:break-word;flex-shrink:0;box-shadow:var(--sh)}
+.caret{display:inline-block;width:2px;height:19px;background:var(--b700);vertical-align:text-bottom;animation:blink 1s steps(2) infinite;border-radius:1px}
+@keyframes blink{50%{opacity:0}}
+
+/* Prediction buttons — 4 large stable slots */
+.preds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:7px 9px 5px;flex-shrink:0}
+.pb{height:74px;background:var(--panel);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;color:var(--ink);cursor:pointer;position:relative;overflow:hidden;text-align:center;padding:6px 5px;display:flex;align-items:center;justify-content:center;line-height:1.3;word-break:break-word;transition:border-color .12s,background .12s;box-shadow:var(--sh)}
+.pb:not(.mt):hover{border-color:var(--b700);background:var(--b100)}
+.pb.mt{opacity:.25;cursor:default;pointer-events:none}
+.pb.flash{background:var(--b100);border-color:var(--b700)}
+.dbar{position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--b700)}
+
+/* Keyboard */
+.kb{padding:4px 9px 8px;display:flex;flex-direction:column;gap:4px;flex:1;justify-content:flex-end}
+.krow{display:grid;gap:4px}
+.key{height:49px;background:var(--panel);border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:17px;color:var(--ink);cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;transition:background .09s,border-color .09s;box-shadow:0 2px 0 var(--border)}
+.key:hover{background:var(--b100);border-color:var(--b500)}
+.key:active{transform:translateY(1px);box-shadow:none}
+.key.fn{font-family:var(--mono);font-size:11px;font-weight:500;background:var(--palt)}
+.key.fn:hover{background:var(--b100)}
+.key .dbar{height:3px}
+
+/* Settings footer */
+.sft{height:34px;background:var(--panel);border-top:1px solid var(--border);padding:0 11px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.slbl{font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.slbl input[type=range]{width:85px;accent-color:var(--b700);cursor:pointer}
+.sval{font-family:var(--mono);font-size:10px;min-width:26px}
+.badge{margin-left:auto;background:var(--palt);border:1px solid var(--border);border-radius:10px;padding:2px 8px;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.04em}
+
+/* Empty state */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:var(--muted);padding:40px;text-align:center}
+.empty .ei{font-size:42px;opacity:.3}
+.empty h2{font-size:15px;color:var(--ink);font-weight:700}
+.empty p{font-size:13px;max-width:220px;line-height:1.5}
+
+/* Modal */
+.ov{display:none;position:fixed;inset:0;background:rgba(9,22,41,.65);z-index:50;align-items:center;justify-content:center}
+.ov.open{display:flex}
+.modal{background:var(--panel);border-radius:12px;width:400px;max-height:72vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.32);padding:20px}
+.mhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mhd h2{font-size:15px;font-weight:700}
+.mcls{background:none;border:none;font-size:17px;cursor:pointer;color:var(--muted)}
+.topt{border:1.5px solid var(--border);border-radius:var(--r);padding:11px 13px;cursor:pointer;margin-bottom:5px;transition:border-color .12s,background .12s}
+.topt:hover{border-color:var(--b700);background:var(--b100)}
+.topt h3{font-size:14px;font-weight:700;margin-bottom:2px}
+.topt p{font-size:12px;color:var(--muted)}
+
+/* Toast */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--b900);color:#fff;padding:8px 18px;border-radius:18px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.03em;opacity:0;transition:opacity .2s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.show{opacity:1}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M2 3h12M2 7h8M2 11h10" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    NOTE WRITER
+  </div>
+  <div class="sep"></div>
+  <div class="hdr-r">
+    <button class="hbtn" id="tpl-btn">⊞ Template</button>
+    <button class="hbtn" id="add-btn">+ Section</button>
+    <button class="hbtn" id="exp-btn">↓ Export</button>
+    <button class="hbtn" id="dark-btn">◐ Dark</button>
+  </div>
+</header>
+
+<div class="split">
+  <div class="doc">
+    <div class="pbar">
+      <span class="plbl">📄 My Notes</span>
+      <span class="wct" id="wct">0 words</span>
+    </div>
+    <div class="ttl-wrap">
+      <input class="ttl" id="doc-ttl" placeholder="Note title…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="sec-scroll" id="sec-scroll"></div>
+    <div class="doc-ft">
+      <button class="dfb" id="clear-btn">Clear all</button>
+      <button class="dfb sol" id="exp-btn2">Export .txt</button>
+    </div>
+  </div>
+
+  <div class="editor" id="editor">
+    <div class="empty"><div class="ei">✏️</div><h2>Select a section</h2><p>Click any section on the left to start writing.</p></div>
+  </div>
+</div>
+
+<div class="ov" id="tpl-ov">
+  <div class="modal">
+    <div class="mhd"><h2>Choose a template</h2><button class="mcls" id="mcls">✕</button></div>
+    <div id="tpl-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/lz-string@1.4.4/libs/lz-string.min.js"></script>
+<script src="https://unpkg.com/predictionary@1.6.0/dist/predictionary.min.js"
+        onerror="window._pdFail=true"></script>
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════
+ * PERSONAL NOTES CORPUS
+ * Pre-trains Predictionary's bigram model on realistic
+ * personal note sentences. This is what makes next-word
+ * prediction feel natural — "I " → "am/felt/went/had",
+ * "feeling " → "tired/good/anxious/better" etc.
+ * ══════════════════════════════════════════════════════════ */
+const CORPUS = `
+Woke up early this morning feeling refreshed and ready.
+Woke up late and felt rushed getting ready today.
+Did not sleep well last night and feel tired today.
+Had a really good sleep and woke up feeling great.
+Went to bed early last night which helped a lot.
+Could not sleep because I was anxious and overthinking.
+Slept through the night and feel much better for it.
+Woke up in the middle of the night feeling worried.
+I am feeling really good today overall.
+I am feeling tired and a bit low today.
+I am feeling anxious and stressed about things.
+I am feeling calm and grateful today.
+I am feeling overwhelmed and need a break.
+I am feeling hopeful about what is coming.
+I am feeling sad and not sure why.
+I am feeling happy and content right now.
+I am feeling frustrated with how things are going.
+I am feeling excited about what is happening.
+I am feeling much better than I was yesterday.
+I am feeling uncertain about what to do next.
+I am feeling proud of myself for getting through today.
+I am feeling disconnected and need some time alone.
+I am not feeling great but getting through it.
+I am feeling more positive than I have in a while.
+I felt much better after talking to someone today.
+I felt really low this afternoon for no reason.
+I felt happy and relaxed spending time outside today.
+I felt anxious at the thought of going out today.
+I felt grateful for the small things today.
+I felt angry and tried to calm myself down.
+I felt tired all day and struggled to focus.
+I felt hopeful after having a good conversation.
+I felt overwhelmed and needed to take a step back.
+I felt at peace with everything for a while today.
+I felt nervous about it but it went okay in the end.
+I felt a bit better after eating something proper.
+I went for a walk this morning which helped.
+I went to the shops and got what I needed.
+I went to bed early and slept really well.
+I went out for a bit and it lifted my mood.
+I went for a run and felt much better after.
+I went to the doctors today for my appointment.
+I went to visit family and it was really good.
+I went outside for the first time in a few days.
+I had a good conversation with a friend today.
+I had a terrible headache most of the day.
+I had a productive morning getting things done.
+I had a slow day at home which was needed.
+I had a long call with family this evening.
+I had a really good day and felt like myself.
+I had a difficult morning but the afternoon improved.
+I had some quiet time to think and reflect.
+I had a moment of clarity about what I want.
+I had a good cry and felt better afterwards.
+I had coffee and sat quietly for a while.
+I had breakfast outside and it was really nice.
+I had a really bad day and need to rest now.
+I need to remember to call the doctor soon.
+I need to sort out a few things this week.
+I need to make time for myself this week.
+I need to rest more and stop pushing so hard.
+I need to eat better and drink more water.
+I need to get back to exercising more regularly.
+I need to talk to someone about how I am feeling.
+I need to be kinder to myself and more patient.
+I need to sleep more and stop staying up late.
+I need to get outside more and move my body.
+I need to stop worrying so much about things.
+I need to find time to do the things I enjoy.
+I want to feel better than I do right now.
+I want to spend more time with people I love.
+I want to read more and be more present.
+I want to be more consistent with good habits.
+I want to write in this journal every day.
+I want to feel calm and in control more often.
+I want to make the most of each day.
+I want to focus on the positive things in life.
+I want to be more patient with myself and others.
+I want to start each morning with a clear head.
+I want to stop comparing myself to other people.
+I want to feel proud of who I am becoming.
+I noticed that I feel better when I sleep enough.
+I noticed that exercise really helps my mood.
+I noticed that I am more anxious in the evenings.
+I noticed that talking to friends always helps me.
+I noticed how much better I feel after going outside.
+I noticed that eating well makes a big difference.
+I noticed that I am harder on myself than others.
+I noticed that rest makes everything feel more manageable.
+Today was a really good day overall.
+Today was difficult and I struggled a lot.
+Today was quiet and I enjoyed the peace.
+Today was busy but I managed to get things done.
+Today was emotional for reasons I am still processing.
+Today was better than yesterday which feels like progress.
+Today was hard but I got through it which matters.
+Today I felt more like myself than I have in weeks.
+Today I managed to do the things I had been avoiding.
+Today I needed to be gentle with myself and that is okay.
+Today I felt grateful for the small things around me.
+Yesterday was hard and I am glad it is over now.
+Yesterday I felt much more like myself again.
+Yesterday was a turning point I think.
+Yesterday was one of those days where nothing felt right.
+Yesterday I got a lot done and felt good about it.
+This morning I felt anxious before getting out of bed.
+This morning started well and set a good tone for the day.
+This afternoon I had a long rest which I really needed.
+This evening I feel more settled and calm than before.
+Tonight I want to wind down early and get some sleep.
+This week has been tough but I am still going.
+This week I want to focus on taking care of myself.
+Feeling grateful for the people in my life right now.
+Feeling tired but in a good peaceful kind of way.
+Feeling hopeful that things will slowly get better.
+Feeling stuck and not sure what to do next.
+Feeling proud of myself for keeping going today.
+Feeling a bit lost and disconnected from things lately.
+Feeling more like myself than I have in a long while.
+Feeling overwhelmed by everything that needs doing.
+Feeling content and that is enough for now today.
+Feeling worried about things I cannot really control.
+Feeling better for having written this all down.
+Feeling scared but trying to be brave about it.
+Had coffee this morning and sat quietly for a while.
+Drank lots of water today and felt much better.
+Ate well today which made a real difference.
+Spent time outside and it lifted my mood a lot.
+Read for an hour before bed which helped me relax.
+Cooked a nice meal and enjoyed eating it slowly.
+Called a friend and felt much better afterwards.
+Spoke to family today and it was really good.
+Went for a short walk and felt calmer after.
+Took some time just to sit and breathe slowly.
+Had a moment of real clarity about what matters most.
+Had a tough conversation that needed to happen today.
+Had a really good laugh today which was so needed.
+Had some time just to sit quietly and think things through.
+Thinking about what I want to focus on this week.
+Thinking about how to deal with a difficult situation.
+Thinking about all the things I am grateful for today.
+Thinking that I need to be much kinder to myself.
+Thinking about what really matters to me right now.
+Thinking about how far I have come from where I was.
+Need to call a friend and catch up properly soon.
+Need to book a doctor appointment at some point.
+Need to rest more and stop running on empty all the time.
+Need to get out of the house and into the fresh air.
+Need to finish the things I have been putting off.
+Need to be more patient with the process of healing.
+Grateful for my health and the people around me.
+Grateful for a warm home and enough to eat today.
+Grateful for small moments of happiness throughout the day.
+Grateful that today is over and tomorrow is a new start.
+Grateful for the support of people who care about me.
+Grateful that I got through it even when it felt hard.
+Looking forward to the weekend and having some proper rest.
+Looking forward to seeing friends and family soon.
+Looking forward to things slowly getting a bit easier.
+Looking back on today I think I did okay really.
+Looking back it was not as bad as I had feared.
+One thing I noticed today is that I need more rest.
+One thing I want to do differently tomorrow is slow down.
+One thing I am proud of today is that I kept going.
+One good thing that happened today was a nice walk.
+One thing I am looking forward to is getting more sleep.
+Went to bed feeling much calmer than I did this morning.
+Ended the day feeling okay and that is something.
+Tomorrow I want to try to have a gentler and better day.
+Tomorrow I am going to rest and take things slowly.
+Tomorrow I will try to eat well and get some fresh air.
+Tomorrow I want to be kinder to myself and others.
+Next week I want to focus on the things that matter most.
+`.trim();
+
+/* ══════════════════════════════════════════════════════════
+ * TEMPLATES — personal notes only
+ * ══════════════════════════════════════════════════════════ */
+const TMPLS = {
+  quick:   { label:'Quick Note',       desc:'One blank section. Just start writing.',              sections:['Notes'] },
+  journal: { label:'Daily Journal',    desc:'Morning feeling, what happened, reflections.',        sections:['How I feel today','What happened','Reflections','What I am grateful for','Intention for tomorrow'] },
+  mood:    { label:'Mood Log',         desc:'Track how you are feeling and why.',                  sections:['Current mood','What triggered this','How it felt','What helped'] },
+  weekly:  { label:'Weekly Review',    desc:'Highlights, challenges, lessons, goals.',             sections:['Highlights this week','Challenges','What I learned','How I felt overall','Goals for next week'] },
+  todo:    { label:'To Do',            desc:'Tasks and notes.',                                    sections:['Today','Later this week','At some point','Notes'] },
+  goals:   { label:'Goals',            desc:'What you want and why.',                              sections:['What I want','Why it matters','Steps I can take','How I will know'] },
+  letter:  { label:'Letter to Myself', desc:'Write freely to yourself.',                          sections:['Dear me'] },
+};
+
+/* ══════════════════════════════════════════════════════════
+ * STATE
+ * ══════════════════════════════════════════════════════════ */
+const S = {
+  doc: { title:'', sections:[] },
+  activeId: null,
+  editText: '',
+  preds: ['','','',''],
+  dark: false,
+  dwell: 0,
+  caps: false,
+};
+
+// Direct DOM references — stored after renderEditor so we never need
+// getElementById inside the hot path (acceptPred / typeChar).
+// This is the key fix for the "display doesn't update" bug.
+let $display = null;   // the text display div
+let $predBtns = [];    // the 4 prediction buttons
+
+let pd = null;
+
+const uid = () => 's' + Math.random().toString(36).slice(2,8);
+
+function mkEl(tag, cls) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+
+function toast(msg, dur=1800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), dur);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PREDICTIONARY SETUP
+ * ══════════════════════════════════════════════════════════ */
+function initPd() {
+  if (window._pdFail || typeof Predictionary === 'undefined') {
+    console.warn('Predictionary not loaded'); return;
+  }
+  pd = Predictionary.instance();
+
+  // Train bigrams from the personal notes corpus.
+  // learnFromText() learns word SEQUENCES, not just words — this is
+  // what makes "I " → "am/felt/went" and "feeling " → "tired/good" work.
+  pd.learnFromText(CORPUS);
+
+  // Add individual common note words for prefix-completion ("fee" → "feel")
+  pd.addWords(`I am is was are were be been have has had do did will would could should not
+    feeling feel felt good great fine okay bad low sad happy tired exhausted anxious stressed calm
+    peaceful worried scared nervous excited hopeful proud grateful content overwhelmed frustrated
+    angry upset disappointed confused uncertain lonely connected present mindful
+    today yesterday tomorrow morning afternoon evening night week month
+    woke slept went had did made took called spoke talked read watched ate drank cooked walked ran
+    need want going try remember forget help rest sleep eat drink exercise write think
+    really very much quite just still already yet always never sometimes often
+    better worse same different easier harder more less
+    because when after before while until since although though
+    people friend family home work outside inside together alone
+    things time day life feel like know think believe remember hope wish`.split(/\s+/).filter(Boolean));
+
+  // Load previously saved personal dictionary
+  const saved = localStorage.getItem('nw_dict');
+  if (saved) { try { pd.loadDictionary(saved); } catch(e) {} }
+}
+
+function refreshPreds() {
+  if (!pd) { S.preds = ['','','','']; return; }
+  const raw = pd.predict(S.editText, { maxPredictions: 4 }) || [];
+  // Clean predictions — trim whitespace, filter empties
+  const clean = raw.map(w => (w||'').trim()).filter(Boolean);
+  while (clean.length < 4) clean.push('');
+  S.preds = clean.slice(0, 4);
+}
+
+// Applies a prediction to the current text:
+// - If mid-word ("I feel" + "feeling"): replaces partial → "I feeling "
+// - If after space ("I feel " + "good"): appends → "I feel good "
+function applyWord(text, word) {
+  const lastWord = (text.match(/[^\s]*$/) || [''])[0];
+  const base = text.slice(0, text.length - lastWord.length);
+  return base + word + ' ';
+}
+
+function savePd() {
+  if (!pd) return;
+  try { localStorage.setItem('nw_dict', pd.dictionaryToJSON()); } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════════
+ * DOM UPDATE — text display
+ *
+ * FIX: Use textContent + createElement instead of innerHTML.
+ * innerHTML can be batched or re-parsed; direct DOM node
+ * manipulation is always synchronous and immediate.
+ * We also use stored $display reference instead of getElementById
+ * to avoid any lookup failure during a click handler.
+ * ══════════════════════════════════════════════════════════ */
+function updateDisplay() {
+  if (!$display) return;
+  // Remove all children
+  while ($display.firstChild) $display.removeChild($display.firstChild);
+  // Add text as a text node (safe, no encoding needed, handles \n with pre-wrap)
+  if (S.editText) {
+    $display.appendChild(document.createTextNode(S.editText));
+  }
+  // Add blinking cursor
+  const cur = document.createElement('span');
+  cur.className = 'caret';
+  $display.appendChild(cur);
+  // Scroll to bottom
+  $display.scrollTop = $display.scrollHeight;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * DOM UPDATE — prediction buttons
+ *
+ * FIX: Use stored $predBtns references and update content
+ * directly rather than cloning/replacing DOM nodes.
+ * Re-binding happens by replacing the button clone — but
+ * we do this by updating a shared array reference so the
+ * click closures always capture the current prediction.
+ * ══════════════════════════════════════════════════════════ */
+function updatePreds() {
+  for (let i = 0; i < 4; i++) {
+    const btn = $predBtns[i];
+    if (!btn) continue;
+    const word = S.preds[i] || '';
+
+    // Create replacement button with fresh listeners
+    const next = mkEl('button', 'pb' + (word ? '' : ' mt'));
+    next.textContent = word;
+    const bar = mkEl('span', 'dbar');
+    next.appendChild(bar);
+    if (word) {
+      const w = word; // capture for closure
+      bindAction(next, () => acceptPred(w));
+    }
+
+    btn.parentNode.replaceChild(next, btn);
+    $predBtns[i] = next; // update stored reference
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+ * DWELL-CLICK
+ * Click always fires immediately. Dwell is an optional
+ * extra for sip-and-puff / scanning users.
+ * ══════════════════════════════════════════════════════════ */
+function bindAction(el, fn) {
+  let timer = null;
+  const bar = el.querySelector('.dbar');
+  const cancel = () => {
+    if (timer) { clearTimeout(timer); timer = null; }
+    if (bar) { bar.style.transition = 'none'; bar.style.width = '0'; }
+  };
+  // Click always fires immediately (cancel kills any pending dwell)
+  el.addEventListener('click', () => { cancel(); fn(); });
+  el.addEventListener('mouseenter', () => {
+    if (S.dwell <= 0) return;
+    if (bar) {
+      bar.style.transition = 'none'; bar.style.width = '0';
+      void bar.offsetWidth; // force reflow to restart animation
+      bar.style.transition = `width ${S.dwell}ms linear`;
+      bar.style.width = '100%';
+    }
+    timer = setTimeout(() => {
+      timer = null;
+      if (bar) { bar.style.transition = 'none'; bar.style.width = '0'; }
+      fn();
+    }, S.dwell);
+  });
+  el.addEventListener('mouseleave', cancel);
+}
+
+/* ══════════════════════════════════════════════════════════
+ * EDITING ACTIONS
+ * ══════════════════════════════════════════════════════════ */
+
+// Accept a prediction — immediately updates display then refreshes preds
+function acceptPred(word) {
+  if (!word) return;
+
+  S.editText = applyWord(S.editText, word);
+
+  // ── Update display NOW, synchronously ──────────────────
+  // This is the fix: updateDisplay() runs before anything else
+  // so the text box always reflects the accepted prediction instantly.
+  updateDisplay();
+
+  // Teach Predictionary this choice (full text for bigram context)
+  if (pd) {
+    pd.learnFromChosen(word);
+    // learnFromInput needs the FULL current text to extract
+    // the bigram (previousWord → word). Passing just the word
+    // loses all context. This is the learning fix.
+    pd.learnFromInput(S.editText.trim());
+    savePd();
+  }
+
+  // Refresh prediction buttons
+  refreshPreds();
+  updatePreds();
+
+  // Brief flash on accepted button slot to confirm the action
+  const slot = $predBtns.find(b => b && b.textContent === word);
+  if (slot) {
+    slot.classList.add('flash');
+    setTimeout(() => slot && slot.classList.remove('flash'), 200);
+  }
+}
+
+// Type a character from keyboard
+function typeChar(ch) {
+  S.editText += (S.caps && /^[a-z]$/.test(ch)) ? ch.toUpperCase() : ch;
+
+  updateDisplay(); // immediate display update
+
+  // On word boundary (space or newline): teach Predictionary the
+  // completed word with its context. Pass FULL text so it captures
+  // the bigram (what comes after what).
+  if ((ch === ' ' || ch === '\n') && pd) {
+    const trimmed = S.editText.trim();
+    if (trimmed) {
+      pd.learnFromInput(trimmed);
+      savePd();
+    }
+  }
+
+  refreshPreds();
+  updatePreds();
+}
+
+function doBack() {
+  S.editText = S.editText.slice(0, -1);
+  updateDisplay();
+  refreshPreds();
+  updatePreds();
+}
+
+function confirmSection() {
+  const sec = S.doc.sections.find(s => s.id === S.activeId);
+  if (!sec) return;
+  sec.content = S.editText;
+
+  // Also train Predictionary on the full confirmed text — this
+  // is the main learning loop: over time it learns the user's
+  // own vocabulary and phrase patterns from their notes.
+  if (pd && S.editText.trim()) {
+    pd.learnFromText(S.editText.trim());
+    savePd();
+  }
+
+  saveDoc();
+  renderDocPanel();
+  countWords();
+  toast('✓ Sent to notes');
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PERSISTENCE
+ * ══════════════════════════════════════════════════════════ */
+function saveDoc() {
+  try { localStorage.setItem('nw_doc', JSON.stringify(S.doc)); } catch(e) {}
+}
+
+function loadDoc() {
+  const raw = localStorage.getItem('nw_doc');
+  if (raw) {
+    try {
+      const d = JSON.parse(raw);
+      if (d && d.sections && d.sections.length) {
+        S.doc = d;
+        S.activeId = S.doc.sections[0].id;
+        S.editText = S.doc.sections[0].content;
+        return;
+      }
+    } catch(e) {}
+  }
+  loadTemplate('quick');
+}
+
+function loadTemplate(key) {
+  const t = TMPLS[key];
+  S.doc.title = t.label;
+  S.doc.sections = t.sections.map(h => ({ id: uid(), heading: h, content: '' }));
+  S.activeId = S.doc.sections[0].id;
+  S.editText = '';
+  saveDoc();
+}
+
+function countWords() {
+  const t = S.doc.sections.map(s => s.content).join(' ');
+  const n = t.trim() ? t.trim().split(/\s+/).length : 0;
+  const el = document.getElementById('wct');
+  if (el) el.textContent = n + (n === 1 ? ' word' : ' words');
+}
+
+/* ══════════════════════════════════════════════════════════
+ * RENDER — Document panel (left)
+ * ══════════════════════════════════════════════════════════ */
+function renderDocPanel() {
+  const scroll = document.getElementById('sec-scroll');
+  if (!scroll) return;
+  scroll.innerHTML = '';
+  S.doc.sections.forEach(sec => {
+    const card = mkEl('div', 'sc'
+      + (sec.id === S.activeId ? ' active' : '')
+      + (sec.content.trim() ? ' filled' : ''));
+    const head = mkEl('div', 'sc-h');
+    head.textContent = sec.heading;
+    const body = mkEl('div', 'sc-b' + (sec.content.trim() ? '' : ' mt'));
+    body.textContent = sec.content.trim() || 'Empty — click to edit';
+    card.appendChild(head);
+    card.appendChild(body);
+    card.addEventListener('click', () => activateSec(sec.id));
+    scroll.appendChild(card);
+  });
+  document.getElementById('doc-ttl').value = S.doc.title;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * RENDER — Editor panel (right)
+ * ══════════════════════════════════════════════════════════ */
+function activateSec(id) {
+  // Save current edit before switching sections
+  if (S.activeId) {
+    const cur = S.doc.sections.find(s => s.id === S.activeId);
+    if (cur) { cur.content = S.editText; saveDoc(); }
+  }
+  S.activeId = id;
+  const sec = S.doc.sections.find(s => s.id === id);
+  S.editText = sec ? sec.content : '';
+  refreshPreds();
+  renderEditor();
+  renderDocPanel();
+  countWords();
+}
+
+function renderEditor() {
+  const panel = document.getElementById('editor');
+  if (!panel) return;
+
+  // Clear stored references
+  $display = null;
+  $predBtns = [];
+
+  const sec = S.doc.sections.find(s => s.id === S.activeId);
+  if (!sec) {
+    panel.innerHTML = '';
+    const es = mkEl('div', 'empty');
+    es.innerHTML = '<div class="ei">✏️</div><h2>Select a section</h2><p>Click any section on the left to start writing.</p>';
+    panel.appendChild(es);
+    return;
+  }
+
+  panel.innerHTML = '';
+
+  // ── Top bar ────────────────────────────────────────────
+  const top = mkEl('div', 'etop');
+  const lbl = mkEl('span', 'elbl');
+  lbl.textContent = '✏ ' + sec.heading;
+  const clearBtn = mkEl('button', 'tbtn');
+  clearBtn.textContent = 'Clear';
+  const sendBtn = mkEl('button', 'tbtn send');
+  sendBtn.textContent = '✓ Send to Notes';
+  top.appendChild(lbl); top.appendChild(clearBtn); top.appendChild(sendBtn);
+  panel.appendChild(top);
+
+  clearBtn.addEventListener('click', () => {
+    S.editText = '';
+    updateDisplay();
+    refreshPreds();
+    updatePreds();
+  });
+  sendBtn.addEventListener('click', confirmSection);
+
+  // ── Text display ────────────────────────────────────────
+  // Store reference in $display so updateDisplay() never needs getElementById
+  $display = mkEl('div', 'td');
+  panel.appendChild($display);
+  updateDisplay(); // populate with current S.editText
+
+  // ── Prediction buttons ──────────────────────────────────
+  // Build 4 stable slots; store references in $predBtns array
+  // so updatePreds() can update them by stored reference, not getElementById
+  const prow = mkEl('div', 'preds');
+  $predBtns = [];
+  for (let i = 0; i < 4; i++) {
+    const word = S.preds[i] || '';
+    const btn = mkEl('button', 'pb' + (word ? '' : ' mt'));
+    btn.textContent = word;
+    const bar = mkEl('span', 'dbar');
+    btn.appendChild(bar);
+    if (word) {
+      const w = word;
+      bindAction(btn, () => acceptPred(w));
+    }
+    $predBtns.push(btn);
+    prow.appendChild(btn);
+  }
+  panel.appendChild(prow);
+
+  // ── Keyboard ─────────────────────────────────────────────
+  panel.appendChild(buildKb());
+
+  // ── Settings footer ───────────────────────────────────────
+  const ft = mkEl('div', 'sft');
+
+  const dwLbl = mkEl('span', 'slbl');
+  dwLbl.textContent = 'DWELL ';
+  const dwSl = document.createElement('input');
+  dwSl.type = 'range'; dwSl.min = '0'; dwSl.max = '1500'; dwSl.step = '100';
+  dwSl.value = String(S.dwell); dwSl.className = '';
+  const dwVal = mkEl('span', 'sval');
+  dwVal.textContent = S.dwell ? S.dwell + 'ms' : 'off';
+  dwLbl.appendChild(dwSl); dwLbl.appendChild(dwVal);
+  ft.appendChild(dwLbl);
+
+  const capsLbl = mkEl('span', 'slbl');
+  capsLbl.style.cssText = 'cursor:pointer;padding:2px 8px;border-radius:4px;border:1px solid var(--border)';
+  const capsVal = mkEl('span', '');
+  capsVal.style.color = 'var(--b700)';
+  capsVal.textContent = S.caps ? 'ON' : 'off';
+  capsLbl.appendChild(document.createTextNode('⇧ CAPS: '));
+  capsLbl.appendChild(capsVal);
+  capsLbl.addEventListener('click', () => {
+    S.caps = !S.caps;
+    capsVal.textContent = S.caps ? 'ON' : 'off';
+  });
+  ft.appendChild(capsLbl);
+
+  const badge = mkEl('span', 'badge');
+  badge.textContent = 'Predictionary · no API · learning';
+  ft.appendChild(badge);
+
+  panel.appendChild(ft);
+
+  dwSl.addEventListener('input', e => {
+    S.dwell = +e.target.value;
+    dwVal.textContent = S.dwell ? S.dwell + 'ms' : 'off';
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+ * KEYBOARD
+ * ══════════════════════════════════════════════════════════ */
+function buildKb() {
+  const wrap = mkEl('div', 'kb');
+  [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l',"'"],
+    ['z','x','c','v','b','n','m',',','.','?'],
+  ].forEach(row => {
+    const r = mkEl('div', 'krow');
+    r.style.gridTemplateColumns = `repeat(${row.length},1fr)`;
+    row.forEach(ch => r.appendChild(mkKey(ch, () => typeChar(ch))));
+    wrap.appendChild(r);
+  });
+  const bot = mkEl('div', 'krow');
+  bot.style.gridTemplateColumns = '1.2fr 1.2fr 3.5fr 1.2fr 1.2fr';
+  [
+    ['⌫',   doBack,                  true],
+    ['↵',   () => typeChar('\n'),    true],
+    ['SPACE',() => typeChar(' '),    true],
+    ['⇧',   () => {
+      S.caps = !S.caps;
+      // Update caps indicator if it exists
+      const cv = document.querySelector('.sft span[style*="b700"]');
+      if (cv) cv.textContent = S.caps ? 'ON' : 'off';
+    }, true],
+    ['!?',  () => toast('Symbols coming soon'), true],
+  ].forEach(([l,f,fn]) => bot.appendChild(mkKey(l,f,fn)));
+  wrap.appendChild(bot);
+  return wrap;
+}
+
+function mkKey(label, fn, isFn = false) {
+  const k = mkEl('button', 'key' + (isFn ? ' fn' : ''));
+  k.textContent = label;
+  const bar = mkEl('span', 'dbar');
+  k.appendChild(bar);
+  bindAction(k, fn);
+  return k;
+}
+
+/* ══════════════════════════════════════════════════════════
+ * PHYSICAL KEYBOARD (for PC testing)
+ * ══════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (!S.activeId) return;
+  if (e.target.tagName === 'INPUT') return;
+  if (e.ctrlKey || e.metaKey) return;
+  if (e.key === 'Backspace') { e.preventDefault(); doBack(); return; }
+  if (e.key === 'Enter')     { e.preventDefault(); typeChar('\n'); return; }
+  if (e.key === 'Tab')       { e.preventDefault(); return; }
+  if (e.key.length === 1)    { e.preventDefault(); typeChar(e.key); }
+});
+
+/* ══════════════════════════════════════════════════════════
+ * EXPORT
+ * ══════════════════════════════════════════════════════════ */
+function exportDoc() {
+  const title = S.doc.title || 'Notes';
+  const lines = [title, '─'.repeat(Math.min(title.length, 60)), ''];
+  S.doc.sections.forEach(s => {
+    lines.push(s.heading.toUpperCase());
+    lines.push(s.content.trim() || '(empty)');
+    lines.push('');
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title.toLowerCase().replace(/\s+/g, '_') + '.txt';
+  a.click();
+  toast('Exported ✓');
+}
+
+/* ══════════════════════════════════════════════════════════
+ * TEMPLATE MODAL
+ * ══════════════════════════════════════════════════════════ */
+function openTplModal() {
+  const list = document.getElementById('tpl-list');
+  list.innerHTML = '';
+  Object.entries(TMPLS).forEach(([key, t]) => {
+    const d = mkEl('div', 'topt');
+    const h = mkEl('h3'); h.textContent = t.label;
+    const p = mkEl('p'); p.textContent = t.desc;
+    d.appendChild(h); d.appendChild(p);
+    d.addEventListener('click', () => {
+      const has = S.doc.sections.some(s => s.content.trim());
+      if (has && !confirm('Load template? Current content will be cleared.')) return;
+      loadTemplate(key);
+      document.getElementById('tpl-ov').classList.remove('open');
+      renderDocPanel(); renderEditor(); countWords();
+      toast('Loaded: ' + t.label);
+    });
+    list.appendChild(d);
+  });
+  document.getElementById('tpl-ov').classList.add('open');
+}
+
+/* ══════════════════════════════════════════════════════════
+ * INIT
+ * ══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Dark mode
+  if (localStorage.getItem('nw_dark') === '1') {
+    S.dark = true;
+    document.body.classList.add('dark');
+    document.getElementById('dark-btn').textContent = '☀ Light';
+  }
+  document.getElementById('dark-btn').addEventListener('click', () => {
+    S.dark = !S.dark;
+    document.body.classList.toggle('dark', S.dark);
+    document.getElementById('dark-btn').textContent = S.dark ? '☀ Light' : '◐ Dark';
+    localStorage.setItem('nw_dark', S.dark ? '1' : '0');
+  });
+
+  // Predictionary
+  initPd();
+  if (!pd) toast('⚠ Predictionary offline — check internet', 4000);
+
+  // Load doc and render
+  loadDoc();
+  refreshPreds();
+  renderDocPanel();
+  renderEditor();
+  countWords();
+
+  // Title input
+  document.getElementById('doc-ttl').addEventListener('input', e => {
+    S.doc.title = e.target.value;
+    saveDoc();
+  });
+
+  // Header buttons
+  document.getElementById('tpl-btn').addEventListener('click', openTplModal);
+  document.getElementById('exp-btn').addEventListener('click', exportDoc);
+  document.getElementById('exp-btn2').addEventListener('click', exportDoc);
+
+  document.getElementById('add-btn').addEventListener('click', () => {
+    const h = prompt('Section name:');
+    if (!h || !h.trim()) return;
+    if (S.activeId) {
+      const cur = S.doc.sections.find(s => s.id === S.activeId);
+      if (cur) { cur.content = S.editText; saveDoc(); }
+    }
+    const sec = { id: uid(), heading: h.trim(), content: '' };
+    S.doc.sections.push(sec);
+    S.activeId = sec.id;
+    S.editText = '';
+    refreshPreds();
+    saveDoc();
+    renderDocPanel();
+    renderEditor();
+    countWords();
+  });
+
+  document.getElementById('clear-btn').addEventListener('click', () => {
+    if (!confirm('Clear all content? Cannot be undone.')) return;
+    S.doc.sections.forEach(s => s.content = '');
+    S.editText = '';
+    saveDoc();
+    renderDocPanel();
+    renderEditor();
+    countWords();
+    toast('Cleared');
+  });
+
+  document.getElementById('mcls').addEventListener('click', () => {
+    document.getElementById('tpl-ov').classList.remove('open');
+  });
+  document.getElementById('tpl-ov').addEventListener('click', e => {
+    if (e.target === document.getElementById('tpl-ov'))
+      document.getElementById('tpl-ov').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
