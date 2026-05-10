@@ -1,5 +1,7 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
+  "framework": null,
   "builds": [
     {
       "src": "index.html",
@@ -20,11 +22,6 @@
       "dest": "/index.html"
     }
   ],
-  "functions": {
-    "api/report-assist.js": {
-      "maxDuration": 30
-    }
-  },
   "cleanUrls": true,
   "trailingSlash": false
 }
