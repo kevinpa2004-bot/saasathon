@@ -1594,11 +1594,12 @@ document.addEventListener('DOMContentLoaded', () => {
 <style>
   .login-kb {
     position: fixed;
-    left: 50%;
+    right: 18px;
     bottom: 18px;
-    transform: translateX(-50%);
+    transform: none;
     z-index: 430;
-    width: min(620px, calc(100vw - 24px));
+    width: min(520px, calc(52vw - 24px));
+    max-width: calc(100vw - 36px);
     display: none;
     padding: 12px;
     border: 1px solid rgba(3,4,7,.16);
@@ -1657,9 +1658,32 @@ document.addEventListener('DOMContentLoaded', () => {
     border-color: #8ed0f7;
   }
   .login-kb button.fn { font-size: 10px; }
+  @media (max-width: 1080px) and (min-width: 721px) {
+    .login-kb {
+      width: min(430px, calc(48vw - 20px));
+      right: 12px;
+      bottom: 12px;
+      padding: 10px;
+    }
+    .login-kb button.key {
+      height: 36px;
+      font-size: 12px;
+    }
+    .login-kb-row {
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .login-kb-head {
+      margin-bottom: 8px;
+    }
+  }
   @media (max-width: 720px) {
     .login-kb {
+      left: 8px;
+      right: 8px;
       bottom: 8px;
+      transform: none;
+      width: auto;
       padding: 8px;
     }
     .login-kb button.key {
