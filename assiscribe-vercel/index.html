@@ -1595,11 +1595,10 @@ document.addEventListener('DOMContentLoaded', () => {
   .login-kb {
     position: fixed;
     right: 18px;
-    top: 50%;
-    bottom: auto;
-    transform: translateY(-50%);
+    bottom: 18px;
+    transform: none;
     z-index: 430;
-    width: min(390px, calc(38vw - 18px));
+    width: min(520px, calc(52vw - 24px));
     max-width: calc(100vw - 36px);
     display: none;
     padding: 12px;
@@ -1661,11 +1660,9 @@ document.addEventListener('DOMContentLoaded', () => {
   .login-kb button.fn { font-size: 10px; }
   @media (max-width: 1080px) and (min-width: 721px) {
     .login-kb {
-      width: min(360px, calc(38vw - 16px));
+      width: min(430px, calc(48vw - 20px));
       right: 12px;
-      top: 50%;
-      bottom: auto;
-      transform: translateY(-50%);
+      bottom: 12px;
       padding: 10px;
     }
     .login-kb button.key {
@@ -1681,20 +1678,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   @media (max-width: 720px) {
-    .auth-screen {
-      padding-bottom: 290px !important;
-    }
     .login-kb {
       left: 8px;
       right: 8px;
-      top: auto;
       bottom: 8px;
       transform: none;
       width: auto;
       padding: 8px;
     }
     .login-kb button.key {
-      height: 32px;
+      height: 34px;
       font-size: 11px;
       border-radius: 8px;
     }
